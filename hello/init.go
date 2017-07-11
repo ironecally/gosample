@@ -45,5 +45,25 @@ func NewHelloWorldModule() *HelloWorldModule {
 
 func (hlm *HelloWorldModule) SayHelloWorld(w http.ResponseWriter, r *http.Request) {
 	hlm.stats.Add(1)
-	w.Write([]byte("Hello " + hlm.something))
+
+	// r.ParseForm()
+	// r.Form -> map[string][]string
+	// for key, val := range r.Form {
+	// 	for _, val2 := range val {
+	// 		fmt.Println(key, val2)
+	// 	}
+	// }
+
+	// mapGw := map[string]string{
+	// 	"foo": "bar",
+	// }
+	// var mapGw map[string]string
+
+	// mapGw := make(map[string]interface{})
+	// mapGw["foo1"] = 1
+	// mapGw["foo2"] = "bar"
+	// mapGw["foo"] = "bar"
+
+	name := r.FormValue("name")
+	w.Write([]byte("Hello " + name))
 }

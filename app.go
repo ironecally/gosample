@@ -2,11 +2,15 @@ package main
 
 import (
 	"flag"
-	"github.com/google/gops/agent"
+	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/google/gops/agent"
+
+	"github.com/tokopedia/gosample/database"
 	"github.com/tokopedia/gosample/hello"
+	"github.com/tokopedia/gosample/product"
 	"gopkg.in/tokopedia/grace.v1"
 	"gopkg.in/tokopedia/logging.v1"
 )
@@ -25,9 +29,21 @@ func main() {
 		log.Fatal(err)
 	}
 
+	database.InitDB()
+	err := database.DBPool.MainDB.Ping()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	database.InitRedis()
+
 	hwm := hello.NewHelloWorldModule()
 
 	http.HandleFunc("/hello", hwm.SayHelloWorld)
+	http.HandleFunc("/getProduct", product.GetProductHandler)
+
+	http.HandleFunc("/redis/set", database.RedisSetHandler)
+	http.HandleFunc("/redis/get", database.RedisGetHandler)
 	go logging.StatsLog()
 
 	log.Fatal(grace.Serve(":9000", nil))
